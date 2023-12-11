@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
-from .models import Category
+from .models import Category, Product
 # Create your views here.
 
 def index(request):
@@ -10,3 +10,7 @@ def index(request):
 def category(request, key):
     category = get_object_or_404(Category, id=key)
     return HttpResponse(category.name)
+
+def product(request, key):
+    product = get_object_or_404(Product, id=key)
+    return HttpResponse(product.name)
