@@ -4,7 +4,15 @@
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
-     <title>Бычье сердце</title>
+    <title>Бычье сердце</title>
+    <style>
+    @import url(https://weloveiconfonts.com/api/?family=entypo);
+        /* entypo */
+        [class*="entypo-"]:before {
+          font-family: 'entypo', sans-serif;
+        }.katalog-End{text-align: end; font-size:1.4rem;}
+    </style>
+    <style>.img-responsive{align-self :right ;}</style>
 </head>
 <body> 
   <div class="breadcrum">
@@ -21,11 +29,10 @@
         </div>
       </div> 
       <div class="column col-4"></div> 
-      <div class="column col-4 katalogEnd">
+      <div class="column col-4 katalog-End">
         <div class="columns">
-          <style>.katalogEnd{text-align: end;} </style>
-          <div class="column col-10"><a href="#">Зарегистрироваться</a></div>
-          <div class="column col-1"><a href="#">Войти</a></div>
+          <div class="column col-10"><a href="#"><span class="entypo-user"></span></a></div>
+          <div class="column col-1"><a href="#"><span class="entypo-dropbox"></a></div>
         </div>
       </div> 
     </div> 
@@ -38,35 +45,30 @@
     <button class="btn loading">button</button>
     <button class="btn loading">button</button><button class="btn loading">button</button>
 
-<div class="card">
-  <div class="card-image">
-    <img src="img/osx-el-capitan.jpg" class="img-responsive">
-  </div>
-  <div class="card-header">
-    <div class="card-title h5">Пихта домашняя</div>
-    <div class="card-subtitle text-gray">Порпап</div>
-  </div>
-  <div class="card-body">
-  </div>
-  <div class="card-footer">
-    <button class="btn btn-primary">перейти</button>
-  </div>
+ 
+  
+
 </div>
 
 <div class="card">
-    <div class="card-image">
-      <img src="img/osx-el-capitan.jpg" class="img-responsive">
-    </div>
-    <div class="card-header">
-      <div class="card-title h5">Пихта домашняя</div>
-      <div class="card-subtitle text-gray">Порпап</div>
-    </div>
-    <div class="card-body">
-    </div>
-    <div class="card-footer">
-      <button class="btn btn-primary">перейти</button>
+  <div class="card-image">
+    <div class="columns">
+      <div class="column col-2">
+        <img src="https://avatars.mds.yandex.net/i?id=4fc4c52fed318092a559bbe19ba2566b1b8f4ec7-10915107-images-thumbs&n=13" class="img-responsive">
+      </div>
+      <div class="column col-2">
+        <div class="card-header">
+        <div class="card-title h4">Пихта домашняя</div>
+        <div class="card-subtitle text-gray">Порпап</div>
+      </div>
+      <div class="card-body">
+     </div>
+      <div class="card-footer">
+        <button class="btn btn-primary btn-lg">перейти</button>
+      </div>
     </div>
   </div>
+</div>
 
 <div class="card">
   <div class="card-image">
