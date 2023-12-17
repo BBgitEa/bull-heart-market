@@ -14,3 +14,4 @@ def category(request, key):
 def product(request, key):
     product = get_object_or_404(Product, id=key)
     return HttpResponse(product.name)
+
