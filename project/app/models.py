@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    age = models.IntegerField(blank=False, default=18)
+    address = models.TextField(blank=True)
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     preview = models.ImageField(upload_to ='uploads/previews/', blank=True)
