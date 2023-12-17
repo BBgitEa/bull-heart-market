@@ -1,0 +1,12 @@
+
+header{
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+}
+
+div.Hello, div .Hello
+{
+    color :blue;
+    font-weight: 600;
+}
