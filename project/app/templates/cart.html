@@ -10,7 +10,8 @@
     <p>Товары:</p>
     {% for product_stack in product_stacks %}
     <div>
-        <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} шт. - {{product_stack.get_cost}} руб
+        <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
+        {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
     </div>
     {% endfor %}
 </body>

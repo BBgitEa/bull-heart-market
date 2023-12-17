@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{product.name}}</title>
+</head>
+<body>
+    <a href="{{product.wiki_link}}">{{product.name}}</a>
+    <p>{{product.description}}</p>
+    <p>{{product.price}} руб/шт</p>
+    <form method="post" id="form">
+        {% csrf_token %}
+        <input name="product_id" type="number" value="{{product.id}}" hidden>
+        <input name="count" type="number" value="1" />
+        <input id="submit" type="submit" value="Добавить в корзину" />
+    </form>
+    <script>
+        const form = document.getElementById('form');
+        const submit = document.getElementById('submit');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const payload = new URLSearchParams(formData);
+            
+            submit.textContent = "...";
+            fetch('/cart/add/', {
+            method: 'POST',
+            body: payload,
+            })
+            .then(res => res.json())
+            .then(data => console.log(data))
+            .then(submit.textContent = "Добавить в корзину")
+        })
+    </script>
+</body>
+</html>

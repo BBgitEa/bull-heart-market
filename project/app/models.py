@@ -30,6 +30,12 @@ class Product(models.Model):
 
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE) 
+    
+    def get_product_stack(self,product):
+        try:
+            return self.products.get(product = product)
+        except: 
+            return None
 
     def __str__(self):
         return f"Корзина {self.user.first_name} {self.user.last_name}"
