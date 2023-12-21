@@ -30,17 +30,33 @@ def cart(request):
         return HttpResponse("Вы не вошли в аккаунт")
 
 def cart_add(request):
-    if request.user.is_authenticated:
-        product_id = request.POST['product_id']
-        product_count = int(request.POST['count'])
-        cart = request.user.cart
-        product = get_object_or_404(Product, id = product_id)
-        product_stack = cart.get_product_stack(product=product)
-        if product_stack:
-            product_stack.count += product_count
-        else:
-            product_stack = ProductStack(cart=cart, product=product, count=product_count)
-        product_stack.save()
-        return JsonResponse({'status': '200', 'message': 'Product added.'})
-    else:
+    if not request.user.is_authenticated:
         return  JsonResponse({'status': '403', 'message': 'Not Authenticated.'})
+        
+    product_id = request.POST['product_id']
+    product_count = int(request.POST['count'])
+    cart = request.user.cart
+    product = get_object_or_404(Product, id = product_id)
+    product_stack = cart.get_product_stack(product=product)
+    if product_stack:
+        product_stack.count += product_count
+    else:
+        product_stack = ProductStack(cart=cart, product=product, count=product_count)
+    product_stack.save()
+    return JsonResponse({'status': '200', 'message': 'Product added.'})
+
+def cart_delete(request):
+    if not request.user.is_authenticated:
+        return  JsonResponse({'status': '403', 'message': 'Not Authenticated.'})
+    
+    product_id = request.POST['product_id']
+    product = get_object_or_404(Product, id = product_id)
+    cart = request.user.cart
+    product_stack = cart.get_product_stack(product=product)
+    print(product_stack)
+    try:
+        product_stack.delete()
+    except:
+        return JsonResponse({'status': '404', 'message': 'Error occured'})
+    
+    return JsonResponse({'status': '200', 'message': 'Product deleted.'})

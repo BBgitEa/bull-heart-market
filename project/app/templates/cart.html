@@ -12,7 +12,30 @@
     <div>
         <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
         {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
+        <form method="post" class="item-delete-form">
+            {% csrf_token %}
+            <input name="product_id" type="number" value="{{product_stack.product.id}}" hidden>
+            <input id="submit" type="submit" value="Удалить товар" />
+        </form>
     </div>
     {% endfor %}
+    <script>
+        const forms = document.getElementsByClassName('item-delete-form');
+        [...forms].forEach(form => {
+            form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const payload = new URLSearchParams(formData);
+            
+            fetch('/cart/delete/', {
+            method: 'POST',
+            body: payload,
+            })
+            .then(form.parentNode.parentNode.removeChild(form.parentNode))
+            .then(res => res.json())
+            .then(data => alert(data["message"]))
+        }) 
+        });
+    </script>
 </body>
 </html>
