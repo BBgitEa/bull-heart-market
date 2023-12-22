@@ -12,6 +12,11 @@
     <div>
         <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
         {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
+        <form method="post" class="item-change-form">
+            {% csrf_token %}
+            <input name="product_id" type="number" value="{{product_stack.product.id}}" hidden>
+            <input name="count" type="number" value="{{product_stack.count}}" class="item-change-input"/>
+        </form>
         <form method="post" class="item-delete-form">
             {% csrf_token %}
             <input name="product_id" type="number" value="{{product_stack.product.id}}" hidden>
@@ -20,21 +25,46 @@
     </div>
     {% endfor %}
     <script>
-        const forms = document.getElementsByClassName('item-delete-form');
-        [...forms].forEach(form => {
-            form.addEventListener('submit', function(e) {
-            e.preventDefault();
+        const deleteForms = document.getElementsByClassName('item-delete-form');
+        const changeInputs = document.getElementsByClassName('item-change-input');
+
+
+        const changeInterval = 750;
+        const onChangeSubmit = (form) => {
             const formData = new FormData(form);
             const payload = new URLSearchParams(formData);
-            
-            fetch('/cart/delete/', {
+                
+            fetch('/cart/change/', {
             method: 'POST',
             body: payload,
             })
-            .then(form.parentNode.parentNode.removeChild(form.parentNode))
             .then(res => res.json())
-            .then(data => alert(data["message"]))
-        }) 
+            .then(data => console.log(data["message"]))
+        }
+
+        [...deleteForms].forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const payload = new URLSearchParams(formData);
+                
+                fetch('/cart/delete/', {
+                method: 'POST',
+                body: payload,
+                })
+                .then(form.parentNode.parentNode.removeChild(form.parentNode))
+                .then(res => res.json())
+                .then(data => alert(data["message"]))
+            }) 
+        });
+
+        [...changeInputs].forEach(input => {
+            input.addEventListener('change', function(e) {
+                clearTimeout(input.timerId);    
+                input.timerId = setTimeout(()=>{
+                    onChangeSubmit(input.parentNode);   
+                }, changeInterval);          
+            })
         });
     </script>
 </body>

@@ -3,6 +3,12 @@ from django.http import JsonResponse
 from .models import Category, Product, Cart, ProductStack
 # Create your views here.
 
+responces = {
+    "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
+    "error" :  JsonResponse({'status': '404', 'message': 'Error occured'}),
+    "no_auth" : JsonResponse({'status': '403', 'message': 'Not Authenticated.'}),
+}
+
 def index(request):
     categories = Category.objects.all()
     count = categories.count()
@@ -29,34 +35,50 @@ def cart(request):
     else:
         return HttpResponse("Вы не вошли в аккаунт")
 
+
 def cart_add(request):
     if not request.user.is_authenticated:
-        return  JsonResponse({'status': '403', 'message': 'Not Authenticated.'})
+        return responces['no_auth']
         
-    product_id = request.POST['product_id']
     product_count = int(request.POST['count'])
-    cart = request.user.cart
+    product_id = request.POST['product_id']
     product = get_object_or_404(Product, id = product_id)
+    cart = request.user.cart
     product_stack = cart.get_product_stack(product=product)
     if product_stack:
         product_stack.count += product_count
     else:
         product_stack = ProductStack(cart=cart, product=product, count=product_count)
     product_stack.save()
-    return JsonResponse({'status': '200', 'message': 'Product added.'})
+    return responces['success']
+
 
 def cart_delete(request):
     if not request.user.is_authenticated:
-        return  JsonResponse({'status': '403', 'message': 'Not Authenticated.'})
+        return responces['no_auth']
     
+    product_stack = get_product_stack_from_request(request)
+    try:
+        product_stack.delete()
+    except:
+        return responces['error']
+    return responces['success']
+
+
+def cart_change(request):
+    if not request.user.is_authenticated:
+        return  responces['no_auth']
+    
+    product_count = int(request.POST['count'])
+    product_stack = get_product_stack_from_request(request)
+    product_stack.count = product_count
+    product_stack.save()
+    return responces['success']
+
+
+def get_product_stack_from_request(request):
     product_id = request.POST['product_id']
     product = get_object_or_404(Product, id = product_id)
     cart = request.user.cart
     product_stack = cart.get_product_stack(product=product)
-    print(product_stack)
-    try:
-        product_stack.delete()
-    except:
-        return JsonResponse({'status': '404', 'message': 'Error occured'})
-    
-    return JsonResponse({'status': '200', 'message': 'Product deleted.'})
+    return product_stack
