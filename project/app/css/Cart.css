@@ -20,10 +20,78 @@ header
 
 .orderList
 {
-    margin: 1% 5%;
     border: 2px solid black;
     border-radius: 15px;
-    padding: 4px;
+    padding: 25px;
+    height: 70%;
+    overflow: auto;
+
+}
+
+.flexOrderColumn
+{
+    overflow: hidden;
+
+    height: auto;
+    margin: auto 0;
+
+    text-align: center;
+
+    padding: 0 10px;
+}
+
+.flexOrderRow
+{
+    display: flex;
+    height: 100px;
+    border: 1px solid #000;
+    border-radius: 15px;
+    margin: 0 0 10px 0;
+    overflow-x: auto;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    background: white;
+}
+
+.ProductStateMissing
+{
+    color: red;
+    font-weight: 500;
+    min-width: 100px;
+    margin-right: auto;
+}
+
+.Image
+{
+    min-width: 50px;
+    width: 100px;
+}
+
+.Name
+{
+    font-weight: 500;
+    min-width: 100px;
+    width: 200px;
+    color: rgb(0, 0, 0);
+}
+
+.Price
+{
+    min-width: 60px;
+    width: 100px;
+}
+
+.OrderCard
+{
+    width: 400px;
+    min-width: 150px;
+    border: 1px solid rgba(0, 0, 0, 0.521);
+    height: 80%;
+}
+
+.RemoveButton
+{
+    min-width: 30px;
 }
 
 .headEnd
@@ -31,54 +99,7 @@ header
     text-align: right;
 }
 
-.info
-{
-    text-align: center;
-    color:red;
-    font-weight: 600;
-}
-
-.flexTable
-{
-    margin: 6px;
-    display: flex;
-    border: 2px solid gray;
-    border-radius: 10px;
-}
-
-
-.flexColumn
-{
-    margin: 5px;
-    padding: auto;
-}
-
-.first
-{
-    width: 20%;
-    height: 20%;
-    min-width: 70px;
-    min-height: 70px;
-}
-
-.second
-{
-    min-width: 100px;
-    color: red;
-    font-weight: 600;
-    text-align: center;
-}
-
-.nonStretchy
-{
-    width: auto;
-}
-
-.content img
+.orderList img
 {
     width: 100%;
 }
-
-
-
-
