@@ -1,7 +1,12 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.http import JsonResponse
-from .models import Category, Product, Cart, ProductStack
+from django.contrib.auth.models import Group
+from .models import Category, Product, Cart, ProductStack, User, EmailActivation
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -78,3 +83,92 @@ def get_product_stack_from_request(request):
     cart = request.user.cart
     product_stack = cart.get_product_stack(product=product)
     return product_stack
+
+
+def login_view(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect(index)
+        return render(request, 'auth/login.html')
+
+    username = request.POST['username']
+    password = request.POST['password']
+        
+    if username and password:
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            return redirect(index)
+
+    return render(request, 'auth/login.html', context= {
+                'message':  'Неверные пароль или имя пользователя.',
+                'last_username': username,
+    })
+
+def logout_view(request):
+    logout(request)
+    return redirect(index)
+
+def signup_view(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect(index)
+        return render(request, 'auth/signup.html')
+
+    username = request.POST['username']
+    password = request.POST['password']
+    email = request.POST['email']
+        
+    if username and password and email:
+        try:
+            validate_email(email)
+        except ValidationError as e:
+            pass
+
+        if not is_user_exist(username, email):
+            user = User.objects.create_user(username, email, password)
+            group = Group.objects.get(name='Customer')
+            user.groups.add(group)
+            user.is_active = False
+            cart = Cart()
+            cart.user = user
+            user.save()
+            cart.save()
+
+            activation = EmailActivation()
+            activation.user = user
+            activation.generate_key()
+            activation.send_email()
+            activation.save()
+
+
+            return redirect(index)
+           
+    return render(request, 'auth/signup.html', context= {
+                'message': 'Введены неверные данные.',
+                'last_username': username,
+                'last_email': email,
+    })
+
+
+def activation_view(request, key):
+    email_activation = get_object_or_404(EmailActivation, key = key)
+    if not email_activation.user.is_active:
+        if timezone.now() > email_activation.expires_in:
+            return HttpResponse('Ключ подтверждения больше не действителен.')
+        else:
+            email_activation.user.is_active = True
+            email_activation.user.save()
+            email_activation.delete()
+            return HttpResponse('Вы успешно подтвердили аккаунт!')
+    else:
+        return HttpResponse('Ваш аккаунт уже подтвержден.')
+
+
+def is_user_exist(username, email):
+    invalidName = User.objects.filter(username=username).first()
+    invalidEmail = User.objects.filter(email=email).first()
+    print(invalidName, invalidEmail)
+    if invalidName or invalidEmail:
+        return True
+    return False

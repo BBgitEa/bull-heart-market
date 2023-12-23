@@ -1,8 +1,9 @@
 from django.db import models
-
-# Create your models here.
-
+from django.core.mail import send_mail
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import make_aware
+import datetime, hashlib, random
 
 class User(AbstractUser):
     age = models.IntegerField(blank=False, default=18)
@@ -14,6 +15,26 @@ class Category(models.Model):
     
     def __str__(self):
         return self.name
+
+class EmailActivation(models.Model):
+    user = models.OneToOneField(User, related_name = 'activation', on_delete = models.CASCADE)
+    key = models.CharField(max_length=64)
+    expires_in = models.DateTimeField()
+
+    def send_email(self):
+        link = settings.DOMAIN_NAME + '/activate/' + self.key
+        message = 'Активируйте свой аккаунт: ' + link
+        send_mail(
+            'Активация аккаута | Bull Heart',
+            message,
+            'bullheartoff <no-reply@gmail.com',
+            [self.user.email],
+            fail_silently= False
+        )
+
+    def generate_key(self):
+        self.key = get_crypted_key(self.user.username)
+        self.expires_in = get_future_date(86400)
 
 
 class Product(models.Model):
@@ -28,6 +49,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE) 
     
@@ -40,6 +62,7 @@ class Cart(models.Model):
     def __str__(self):
         return f"Корзина {self.user.first_name} {self.user.last_name}"
 
+
 class ProductStack(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='products')
     product = models.ForeignKey(Product, on_delete=models.SET_DEFAULT, default=0)
@@ -50,3 +73,13 @@ class ProductStack(models.Model):
 
     def __str__(self):
         return f"{self.product} - {self.count} шт"
+
+
+def get_crypted_key(value):
+    salt = hashlib.sha256(str(random.random()).encode()).hexdigest()[:10]
+    key = hashlib.sha256((salt+value).encode()).hexdigest()
+    return key  
+
+def get_future_date(time):
+    date = datetime.datetime.now() + datetime.timedelta(seconds=time)
+    return make_aware(date)
