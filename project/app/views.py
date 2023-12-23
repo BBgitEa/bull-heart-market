@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.models import Group
-from .models import Category, Product, Cart, ProductStack, User
+from .models import Category, Product, Cart, ProductStack, User, EmailActivation
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -133,6 +134,14 @@ def signup_view(request):
             cart.user = user
             user.save()
             cart.save()
+
+            activation = EmailActivation()
+            activation.user = user
+            activation.generate_key()
+            activation.send_email()
+            activation.save()
+
+
             return redirect(index)
            
     return render(request, 'auth/signup.html', context= {
@@ -140,6 +149,21 @@ def signup_view(request):
                 'last_username': username,
                 'last_email': email,
     })
+
+
+def activation_view(request, key):
+    email_activation = get_object_or_404(EmailActivation, key = key)
+    if not email_activation.user.is_active:
+        if timezone.now() > email_activation.expires_in:
+            return HttpResponse('Ключ подтверждения больше не действителен.')
+        else:
+            email_activation.user.is_active = True
+            email_activation.user.save()
+            email_activation.delete()
+            return HttpResponse('Вы успешно подтвердили аккаунт!')
+    else:
+        return HttpResponse('Ваш аккаунт уже подтвержден.')
+
 
 def is_user_exist(username, email):
     invalidName = User.objects.filter(username=username).first()

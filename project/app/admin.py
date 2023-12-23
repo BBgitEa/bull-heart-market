@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Category, Product, User, Cart, ProductStack
+from .models import Category, Product, User, Cart, ProductStack, EmailActivation
 # Register your models here.
 
 class ProductStackInline(admin.TabularInline):
@@ -16,3 +16,4 @@ admin.site.register(Product)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(ProductStack)
 admin.site.register(User, UserAdmin)
+admin.site.register(EmailActivation)
