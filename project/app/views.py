@@ -1,7 +1,6 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.http import JsonResponse
 from .models import Category, Product, Cart, ProductStack
-# Create your views here.
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -9,14 +8,17 @@ responces = {
     "no_auth" : JsonResponse({'status': '403', 'message': 'Not Authenticated.'}),
 }
 
+
 def index(request):
     categories = Category.objects.all()
     count = categories.count()
     return render(request, "index.html", {'categories': categories, 'count': count})
 
+
 def category(request, key):
     category = get_object_or_404(Category, id=key)
     return HttpResponse(category.name)
+
 
 def product(request, key):
     product = get_object_or_404(Product, id=key)
@@ -24,16 +26,17 @@ def product(request, key):
         'product': product,
     })
 
+
 def cart(request):
-    if request.user.is_authenticated:
-        cart = get_object_or_404(Cart, user=request.user)
-        product_stacks = cart.products.all()
-        return render(request, "cart.html", {
+    if not request.user.is_authenticated:
+        return HttpResponse("Вы не вошли в аккаунт")
+
+    cart = get_object_or_404(Cart, user=request.user)
+    product_stacks = cart.products.all()
+    return render(request, "cart.html", {
             'username': request.user,
             'product_stacks': product_stacks,
-        })
-    else:
-        return HttpResponse("Вы не вошли в аккаунт")
+    })
 
 
 def cart_add(request):
