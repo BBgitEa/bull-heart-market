@@ -1,5 +1,6 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from .models import Category, Product, Cart, ProductStack
 
@@ -78,3 +79,28 @@ def get_product_stack_from_request(request):
     cart = request.user.cart
     product_stack = cart.get_product_stack(product=product)
     return product_stack
+
+
+def login_view(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect(index)
+        return render(request, 'auth/login.html')
+
+    username = request.POST['username']
+    password = request.POST['password']
+        
+    if username and password:
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            return redirect(index)
+
+    return render(request, 'auth/login.html', context= {
+                'message':  'Неверные пароль или имя пользователя.',
+                'last_username': username,
+    })
+
+def logout_view(request):
+    logout(request)
+    return redirect(index)
