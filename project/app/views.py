@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from .models import Category, Product, Cart, ProductStack
+from django.contrib.auth.models import Group
+from .models import Category, Product, Cart, ProductStack, User
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -104,3 +107,44 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect(index)
+
+def signup_view(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect(index)
+        return render(request, 'auth/signup.html')
+
+    username = request.POST['username']
+    password = request.POST['password']
+    email = request.POST['email']
+        
+    if username and password and email:
+        try:
+            validate_email(email)
+        except ValidationError as e:
+            pass
+
+        if not is_user_exist(username, email):
+            user = User.objects.create_user(username, email, password)
+            group = Group.objects.get(name='Customer')
+            user.groups.add(group)
+            user.is_active = False
+            cart = Cart()
+            cart.user = user
+            user.save()
+            cart.save()
+            return redirect(index)
+           
+    return render(request, 'auth/signup.html', context= {
+                'message': 'Введены неверные данные.',
+                'last_username': username,
+                'last_email': email,
+    })
+
+def is_user_exist(username, email):
+    invalidName = User.objects.filter(username=username).first()
+    invalidEmail = User.objects.filter(email=email).first()
+    print(invalidName, invalidEmail)
+    if invalidName or invalidEmail:
+        return True
+    return False
