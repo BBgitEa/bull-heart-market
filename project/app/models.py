@@ -28,3 +28,25 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+class Cart(models.Model):
+    user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE) 
+    
+    def get_product_stack(self,product):
+        try:
+            return self.products.get(product = product)
+        except: 
+            return None
+
+    def __str__(self):
+        return f"Корзина {self.user.first_name} {self.user.last_name}"
+
+class ProductStack(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='products')
+    product = models.ForeignKey(Product, on_delete=models.SET_DEFAULT, default=0)
+    count = models.IntegerField(blank=False, default=1)
+
+    def get_cost(self):
+        return self.count * self.product.price
+
+    def __str__(self):
+        return f"{self.product} - {self.count} шт"
