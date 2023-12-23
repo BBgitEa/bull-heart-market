@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Category, Product, Cart, ProductStack
 
@@ -27,10 +28,8 @@ def product(request, key):
     })
 
 
+@login_required
 def cart(request):
-    if not request.user.is_authenticated:
-        return HttpResponse("Вы не вошли в аккаунт")
-
     cart = get_object_or_404(Cart, user=request.user)
     product_stacks = cart.products.all()
     return render(request, "cart.html", {
@@ -39,10 +38,8 @@ def cart(request):
     })
 
 
+@login_required
 def cart_add(request):
-    if not request.user.is_authenticated:
-        return responces['no_auth']
-        
     product_count = int(request.POST['count'])
     product_id = request.POST['product_id']
     product = get_object_or_404(Product, id = product_id)
@@ -56,10 +53,8 @@ def cart_add(request):
     return responces['success']
 
 
+@login_required
 def cart_delete(request):
-    if not request.user.is_authenticated:
-        return responces['no_auth']
-    
     product_stack = get_product_stack_from_request(request)
     try:
         product_stack.delete()
@@ -68,10 +63,8 @@ def cart_delete(request):
     return responces['success']
 
 
+@login_required
 def cart_change(request):
-    if not request.user.is_authenticated:
-        return  responces['no_auth']
-    
     product_count = int(request.POST['count'])
     product_stack = get_product_stack_from_request(request)
     product_stack.count = product_count
