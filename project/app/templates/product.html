@@ -9,6 +9,8 @@
     <a href="{{product.wiki_link}}">{{product.name}}</a>
     <p>{{product.description}}</p>
     <p>{{product.price}} руб/шт</p>
+    <p>{{product.get_short_description}}</p>
+    <p>{{product.get_absolute_url}}</p>
     <form method="post" id="form">
         {% csrf_token %}
         <input name="product_id" type="number" value="{{product.id}}" hidden>
