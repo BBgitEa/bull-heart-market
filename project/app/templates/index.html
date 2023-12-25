@@ -33,6 +33,7 @@
     {% for category in categories %}
     <div class="card">
         <p>{{category.name}}</p>
+        <p>{{category.get_absolute_url}}</p>
         <img src="{{category.preview}}">
     </div>
     {% endfor%}

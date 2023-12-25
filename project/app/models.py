@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import make_aware
+from django.urls import reverse
 import datetime, hashlib, random
 
 class User(AbstractUser):
@@ -15,6 +16,9 @@ class Category(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('category',  args=[str(self.id)])
 
 class EmailActivation(models.Model):
     user = models.OneToOneField(User, related_name = 'activation', on_delete = models.CASCADE)
@@ -45,10 +49,16 @@ class Product(models.Model):
     price = models.FloatField(blank=True, default=0)
     wiki_link = models.TextField(blank=True, default="No wiki link")
     available = models.BooleanField(default=False)
+    count = models.IntegerField(blank=False, default=0)
     
     def __str__(self):
         return self.name
 
+    def get_short_description(self):
+        return str(self.description)[:300] + "..."
+
+    def get_absolute_url(self):
+        return reverse('product',  args=[str(self.id)])
 
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE) 
@@ -75,6 +85,9 @@ class ProductStack(models.Model):
         return f"{self.product} - {self.count} шт"
 
 
+
+
+
 def get_crypted_key(value):
     salt = hashlib.sha256(str(random.random()).encode()).hexdigest()[:10]
     key = hashlib.sha256((salt+value).encode()).hexdigest()
@@ -83,3 +96,4 @@ def get_crypted_key(value):
 def get_future_date(time):
     date = datetime.datetime.now() + datetime.timedelta(seconds=time)
     return make_aware(date)
+
