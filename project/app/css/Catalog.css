@@ -1,21 +1,15 @@
 
-header
+.flexOrderRow
 {
-    top: 0;
-    left: 0;
-    padding: 10px;
-    position:sticky;
+    display: flex;
+    height: 210px;
+    border: 1px solid rgba(102, 96, 96, 0.412);
+    border-radius: 35px;
+    margin: 0 0 10px 0;
+    padding: 5px;
 
-    outline: 2px solid black;
-    background-color: white;
-    box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.521);
-}
-
-
-
-.content
-{
-    margin: 15px 5% 0px 5%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    background: white;
 }
 
 .orderList
@@ -40,17 +34,7 @@ header
     padding: 0 10px;
 }
 
-.flexOrderRow
-{
-    display: flex;
-    height: 210px;
-    border: 1px solid rgba(102, 96, 96, 0.412);
-    border-radius: 35px;
-    margin: 0 0 10px 0;
 
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    background: white;
-}
 
 .ProductStateMissing
 {
@@ -62,8 +46,9 @@ header
 
 .Image
 {
-    min-width: 50px;
-    width: 100px;
+    height: 200px;
+    width: 200px;
+    margin-left: 25px;
 }
 
 .Name
