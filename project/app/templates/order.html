@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ</title>
+</head>
+<body>
+    <p>Заказ №{{order.id}}</p>
+    <p>Товары:</p>
+    {% for product_stack in order.products.all %}
+    <div>
+        <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
+        {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
+    </div>
+    {% endfor %}
+</body>
+</html>

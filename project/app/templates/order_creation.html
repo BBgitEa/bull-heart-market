@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа</title>
+</head>
+<body>
+    <p>Товары:</p>
+    {% for product_stack in products %}
+    <div>
+        <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
+        {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
+    </div>
+    {% endfor %} 
+    <p>Общая сумма - {{summ}} руб.</p>
+    <form method="post" class="item-delete-form">
+        {% csrf_token %}
+        <input id="submit" type="submit" value="Заказать" />
+    </form>
+</body>
+</html>

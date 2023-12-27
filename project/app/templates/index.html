@@ -1,42 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
-    <title>Абоба</title>
-    <style>
-        .card{
-            width: 200px;
-            height: 300px;
-            border: 1px solid black;
-            border-radius: 5px;
-            box-shadow: 0px 10px 40px -3px rgba(0,0,0,0.1);
-            
-        }
-        .cards{
-            display: flex;
-            flex-direction: row;
-            gap: 5px;
-        }
-        .card > p{
-            font-weight: bold;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <p>Всего категорий - {{count}}</p>
-    <div class="cards">
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+        <a href="#">Каталог</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block heading %}Категории{% endblock %}
+
+{% block content %}
+<div class="columns">
     {% for category in categories %}
-    <div class="card">
-        <p>{{category.name}}</p>
-        <p>{{category.get_absolute_url}}</p>
-        <img src="{{category.preview}}">
+    <div class="column col-2">
+        <div class="card">
+            <div class="card-image">
+            <img src="{{category.preview.url}}" class="img-responsive">
+            </div>
+            <div class="card-header category-header">
+            <div class="card-title h5">{{category.name}}</div>
+            </div>
+            <div class="card-footer">
+            <a href="{% url 'category' category.id %}" class="btn btn-primary">Перейти <span class="entypo-right"></span></a>
+            </div>
+        </div>
     </div>
-    {% endfor%}
-    </div>
-</body>
-</html>
+    {% endfor %}
+</div>
+{% endblock %}
