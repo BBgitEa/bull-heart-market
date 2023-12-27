@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
     <title>Абоба</title>
     <style>
         .card{
@@ -25,9 +22,32 @@
             font-weight: bold;
             text-align: center;
         }
+        .grid{
+            display: grid;
+            gap: 4px;
+            grid-template-rows: auto;
+            grid-template-columns: 1fr 1fr;
+        }
+        .column{
+            height: 50px;
+            border: 1px solid black;
+        }
     </style>
 </head>
 <body>
+
+    <div class="grid">
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+        <div class="column"></div>
+    </div>
     <p>Всего категорий - {{count}}</p>
     <div class="cards">
     {% for category in categories %}

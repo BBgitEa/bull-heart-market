@@ -13,4 +13,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name = 'logout'),
     path('signup/', views.signup_view, name= 'signup'),
     path('activate/<str:key>', views.activation_view, name = 'activate'),
+    path('order/new/', views.order_creation, name = 'order_creation'),
+    path('order/<str:order_id>', views.order, name = 'order')
 ]

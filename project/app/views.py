@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.models import Group
-from .models import Category, Product, Cart, ProductStack, User, EmailActivation
+from .models import Category, Product, Cart, ProductStack, User, EmailActivation, Order
+import threading
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -138,9 +139,8 @@ def signup_view(request):
             activation = EmailActivation()
             activation.user = user
             activation.generate_key()
-            activation.send_email()
             activation.save()
-
+            threading.Thread(target=activation.send_email).start()
 
             return redirect(index)
            
@@ -172,3 +172,34 @@ def is_user_exist(username, email):
     if invalidName or invalidEmail:
         return True
     return False
+
+
+@login_required
+def order_creation(request):
+    summ = request.user.cart.get_summ()
+    if request.method == 'GET':
+        return render(request, 'order_creation.html', context={
+            'products': request.user.cart.products.all(),
+            'summ' : summ,
+            })
+
+    if request.method == 'POST':
+        order = Order()
+        order.status = 0 #active status
+        order.customer = request.user
+        order.save()
+        order.products.add(*request.user.cart.products.all())
+        order.save()
+        threading.Thread(target=order.send_new_order_email).start()
+        return HttpResponse('Заказ успешно оформлен.')
+
+
+@login_required
+def order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    try:
+        request.user.orders.get(id=order_id)
+    except:
+        return HttpResponse('403 Forbidden')
+    
+    return render(request, 'order.html', context={'order': order})

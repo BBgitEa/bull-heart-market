@@ -10,6 +10,7 @@ class User(AbstractUser):
     age = models.IntegerField(blank=False, default=18)
     address = models.TextField(blank=True)
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     preview = models.ImageField(upload_to ='uploads/previews/', blank=True)
@@ -19,6 +20,7 @@ class Category(models.Model):
     
     def get_absolute_url(self):
         return reverse('category',  args=[str(self.id)])
+
 
 class EmailActivation(models.Model):
     user = models.OneToOneField(User, related_name = 'activation', on_delete = models.CASCADE)
@@ -55,10 +57,11 @@ class Product(models.Model):
         return self.name
 
     def get_short_description(self):
-        return str(self.description)[:300] + "..."
+        return str(self.description)[:100] + "..."
 
     def get_absolute_url(self):
         return reverse('product',  args=[str(self.id)])
+
 
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE) 
@@ -69,8 +72,18 @@ class Cart(models.Model):
         except: 
             return None
 
+
+    def get_summ(self):
+        s = 0
+        for prod in self.products.all():
+            s += int(prod.count) * float(prod.product.price)
+            print(s)
+        return s
+    
+
     def __str__(self):
         return f"Корзина {self.user.first_name} {self.user.last_name}"
+
 
 
 class ProductStack(models.Model):
@@ -85,8 +98,32 @@ class ProductStack(models.Model):
         return f"{self.product} - {self.count} шт"
 
 
+class Order(models.Model):
+    customer = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE, blank=True)
+    products = models.ManyToManyField(ProductStack, related_name='orders', blank=True)
+    statuses = {
+        0 : 'active',
+        1 : 'finished',
+        2 : 'canceled'
+    }
+    status = models.IntegerField(choices=statuses, blank=False, default=0)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    finish_date = models.DateTimeField(blank=True, null=True)
 
+    def get_summ(self):
+        s = 0
+        for prod in self.products.all():
+            s += prod.count * prod.product.price
+        return s
 
+    def send_new_order_email(self):
+        send_mail(
+            'Активация аккаута | Bull Heart',
+            'Заказ успешно оформлен! Просмотреть можно по ссылке:',
+            'bullheartoff <no-reply@gmail.com',
+            [self.customer.email],
+            fail_silently= False
+        )
 
 def get_crypted_key(value):
     salt = hashlib.sha256(str(random.random()).encode()).hexdigest()[:10]
