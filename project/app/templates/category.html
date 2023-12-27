@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+        <a href="{% url 'index' %}">Каталог</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">{{category.name}}</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block heading %}{{category.name}}{% endblock %}
+
+{% block content %}
+<div class="columns">
+    {% for product in category.products.all %}
+    <div class="column col-6">
+        <div class="card">
+            <div class="columns">
+            <div class="column col-3">
+                <div class="card-image">
+                    <img src="{{product.preview.url}}" class="img-responsive">
+                    </div>
+            </div>
+            <div class="column col-9">
+                <div class="card-header">
+                    <div class="card-title h5">{{product.name}}</div>
+                    <div class="card-subtitle">{{product.price}} руб./шт</div>
+                </div>
+                <div class="card-body">
+                {{product.get_short_description}}
+                </div>
+                <div class="card-footer">
+                <a class="btn btn-primary btn-block mb-2" href="{% url 'product' product.id %}">Подробнее</a>
+                <form method="post" id="form" class="add-form OrderCard">
+                    {% csrf_token %}
+                    <input name="product_id" type="number" value="{{product.id}}" hidden>
+                    <button type="button" class="btn btn-action sub-button"><span class="entypo-minus"></span></button>
+                    <input class="form-input counter" name="count" type="number" value="1" />
+                    <button type="button" class="btn btn-action add-button"><span class="entypo-plus"></span></button>
+                    <input class="btn btn-primary" style="flex-grow: 1;" id="submit" type="submit" value="Добавить в корзину" />
+                </form>
+                </div>
+             </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

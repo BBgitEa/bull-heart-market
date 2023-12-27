@@ -22,9 +22,13 @@ def index(request):
     return render(request, "index.html", {'categories': categories, 'count': count})
 
 
+def about(request):
+    return render(request, "about.html")
+
+
 def category(request, key):
     category = get_object_or_404(Category, id=key)
-    return HttpResponse(category.name)
+    return render(request, 'category.html', context={'category': category})
 
 
 def product(request, key):
@@ -41,6 +45,7 @@ def cart(request):
     return render(request, "cart.html", {
             'username': request.user,
             'product_stacks': product_stacks,
+            'cart' : cart,
     })
 
 

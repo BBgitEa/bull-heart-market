@@ -1,38 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{product.name}}</title>
-</head>
-<body>
-    <a href="{{product.wiki_link}}">{{product.name}}</a>
-    <p>{{product.description}}</p>
-    <p>{{product.price}} руб/шт</p>
-    <p>{{product.get_short_description}}</p>
-    <p>{{product.get_absolute_url}}</p>
-    <form method="post" id="form">
-        {% csrf_token %}
-        <input name="product_id" type="number" value="{{product.id}}" hidden>
-        <input name="count" type="number" value="1" />
-        <input id="submit" type="submit" value="Добавить в корзину" />
-    </form>
-    <script>
-        const form = document.getElementById('form');
-        const submit = document.getElementById('submit');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const payload = new URLSearchParams(formData);
-            
-            submit.textContent = "...";
-            fetch('/cart/add/', {
-            method: 'POST',
-            body: payload,
-            })
-            .then(res => res.json())
-            .then(data => alert(data["message"]))
-        })
-    </script>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+        <a href="{% url 'index' %}">Каталог</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'category' product.category.id %}">{{product.category.name}}</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">{{product.name}}</a>
+        </li>    
+    </ul>
+{% endblock %}
+
+{% block heading %}{{product.name}}{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column col-2">
+        <img src="{{product.preview.url}}" class="img-responsive">
+    </div> 
+    <div class="column col-10">
+        <p>
+            <b>{{product.price}} руб./шт.</b> 
+            {% if not product.available %}
+            <span class="text-error"><span class="entypo-attention"></span> Нет в наличии</span>
+            {% endif %}
+        </p>
+        <p>{{product.description}}</p>   
+        <a href="{{product.wiki_link}}"><span class="entypo-help"></span> Узнать больше о растении</a>
+    </div> 
+</div>
+<div class="columns">
+    <div class="column col-6">
+        <form method="post" id="form" class="add-form OrderCard">
+            {% csrf_token %}
+            <input name="product_id" type="number" value="{{product.id}}" hidden>
+            <button type="button" class="btn btn-action sub-button"><span class="entypo-minus"></span></button>
+            <input class="form-input counter" name="count" type="number" value="1" />
+            <button type="button" class="btn btn-action add-button"><span class="entypo-plus"></span></button>
+            <input class="btn btn-primary" style="flex-grow: 1;" id="submit" type="submit" value="Добавить в корзину" />
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <title>{% block title %}Бычье сердце - питомник растений{% endblock %}</title>
+</head>
+
+<body>
+    <header class="navbar">
+        <section class="navbar-section">
+          <span href="..." class="navbar-brand mr-2 label label-dark label-rounded" style="padding:  0.25rem 0.5rem 0.25rem 0.5rem;">Бычье сердце</span>
+          <a href="{% url 'index'%}" class="btn btn-link">Каталог</a>
+          <a href="{% url 'about'%}" class="btn btn-link">О нас</a>
+        </section>
+        <section class="navbar-section">
+            <a href="#" class="btn btn-link text-dark mr-2">{{request.user.username}} <span class="entypo-user"></span></a></div>
+            <a href="{% url 'cart'%}" class="btn btn-link">Корзина <span class="entypo-dropbox"></a></div>
+        </section>
+      </header>
+<div class="container">
+{% block breadcrumbs %}
+{% endblock %}
+<h3>{% block heading %}{% endblock %}</h3>
+{% block content %}
+{% endblock %}
+</div>
+<script type="text/javascript" src="{% static 'script.js' %}"></script>
+</body>
+</html>
