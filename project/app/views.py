@@ -1,3 +1,4 @@
+"""Этот модуль содержит представления(контроллеры), используемые в приложении."""
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import Group
 from .models import Category, Product, Cart, ProductStack, User, EmailActivation, Order
 import threading
+
 
 responces = {
     "success" : JsonResponse({'status': '200', 'message': 'Success.'}),
@@ -21,21 +23,33 @@ messages = {
 }
 
 def index(request):
+    """Представление главной страницы. 
+       Возвращает каталог с категориями по GET запросу."""
+
     categories = Category.objects.all()
     count = categories.count()
     return render(request, "index.html", {'categories': categories, 'count': count})
 
 
 def about(request):
+    """Представление страницы о компании. 
+       Возвращает страницу с информацией о компании по GET запросу."""
+
     return render(request, "about.html")
 
 
 def category(request, key):
+    """Представление страницы категории. 
+       Возвращает страницу категории с карточками с товарами по GET запросу."""
+
     category = get_object_or_404(Category, id=key)
     return render(request, 'category.html', context={'category': category})
 
 
 def product(request, key):
+    """Представление страницы товара. 
+       Возвращает страницу товара с информацией о нем по GET запросу."""
+
     product = get_object_or_404(Product, id=key)
     return render(request, "product.html", {
         'product': product,
@@ -44,6 +58,9 @@ def product(request, key):
 
 @login_required
 def cart(request):
+    """Представление страницы корзины. Требует авторизации.
+       Возвращает страницу корзины с товарами пользователя по GET запросу."""
+
     cart = get_object_or_404(Cart, user=request.user)
     product_stacks = cart.products.all()
     return render(request, "cart.html", {
@@ -55,6 +72,10 @@ def cart(request):
 
 @login_required
 def cart_add(request):
+    """API добавления товара в корзину. Требует авторизации.
+      По POST запросу добавляет стэк товара указанного кол-ва в корзину, если такой товар есть и
+      возвращает JSONResponce с статусом 200."""
+
     product_count = int(request.POST['count'])
     product_id = request.POST['product_id']
     product = get_object_or_404(Product, id = product_id)
@@ -70,6 +91,11 @@ def cart_add(request):
 
 @login_required
 def cart_delete(request):
+    """API для удаления товара из корзины. Требует авторизации.
+       По POST запросу удаляет стэк товара, если он есть в корзине и
+       возвращает JSONResponce с статусом 200 в случае успеха и 
+       статусом 404 при ошибке"""
+
     product_stack = get_product_stack_from_request(request)
     try:
         product_stack.delete()
@@ -80,6 +106,8 @@ def cart_delete(request):
 
 @login_required
 def cart_change(request):
+    """API для изменения количества товара в стэке в корзине. Требует авторизации."""
+
     product_count = int(request.POST['count'])
     product_stack = get_product_stack_from_request(request)
     product_stack.count = product_count
@@ -88,6 +116,9 @@ def cart_change(request):
 
 
 def get_product_stack_from_request(request):
+    """Вспомогательный метод для получения стэка товара
+       из POST-запроса по id товара."""
+
     product_id = request.POST['product_id']
     product = get_object_or_404(Product, id = product_id)
     cart = request.user.cart
@@ -96,6 +127,12 @@ def get_product_stack_from_request(request):
 
 
 def login_view(request):
+    """Представление авторизации на сайте.
+       По GET запросу возвращает страницу входа на сайт.
+       По POST запросу в случае успешного входа перенаправляет на главную страницу,
+       в случае неудачи возращает страницу входа с сообщением об ошибке.
+       Если пользователь авторизован, перенаправляет на главную."""
+
     if request.user.is_authenticated:
         return redirect(index)
 
@@ -117,10 +154,20 @@ def login_view(request):
     })
 
 def logout_view(request):
+    """Представление для выхода из аккаунта на сайте.
+       По GET запросу разлогинивает пользователя и перенаправляет на страницу входа."""
+
     logout(request)
     return redirect(login_view)
 
 def signup_view(request):
+    """Представление для регистрации аккаунта на сайте.
+       По GET запросу возвращает страницу регистрации на сайте.
+       По POST запросу в случае успешного регистрации создает нового пользователя
+       и отправляет на почту ссылку для подтверждения почты,
+       в случае неудачи возращает страницу регистрации с сообщением об ошибке.
+       Если пользователь авторизован, перенаправляет на главную."""
+
     if request.user.is_authenticated:
         return redirect(index)
 
@@ -167,6 +214,11 @@ def signup_view(request):
 
 
 def activation_view(request, key):
+    """Представление для активации почты.
+       Если ключ действителен то подтверждает пользователя(user.is_active = True).
+       Если ключ больше не действителен, то возвращает сообщение об ошибке.
+       Если аккаунт уже подтвержден, то возвращает сообщение об ошибке."""
+
     email_activation = get_object_or_404(EmailActivation, key = key)
     if not email_activation.user.is_active:
         if timezone.now() > email_activation.expires_in:
@@ -181,6 +233,10 @@ def activation_view(request, key):
 
 
 def is_user_exist(username, email):
+    """Вспомогательный метод, определяющий существует ли пользователь
+       с заданным username и(или) email в базе данных.
+       Возвращает True - если да, False - если нет."""
+
     invalidName = User.objects.filter(username=username).first()
     invalidEmail = User.objects.filter(email=email).first()
     if invalidName or invalidEmail:
@@ -190,6 +246,12 @@ def is_user_exist(username, email):
 
 @login_required
 def order_creation(request):
+    """Представление оформления заказа. Требует авторизацию.
+       По GET запросу возвращает страницу оформления заказа.
+       По POST запросу создает новый заказ с содержимым из корзины и 
+       уведомляет об этом пользователя по почте, возвращает сообщение
+       о оформлении в случае успеха."""
+       
     summ = request.user.cart.get_summ()
     if request.method == 'GET':
         return render(request, 'order_creation.html', context={
@@ -210,6 +272,9 @@ def order_creation(request):
 
 @login_required
 def order(request, order_id):
+    """Представление страницы конкретного заказа. Требует авторизацию.
+       По GET запросу возвращает страницу заказа."""
+
     order = get_object_or_404(Order, id=order_id)
     try:
         request.user.orders.get(id=order_id)
@@ -217,3 +282,14 @@ def order(request, order_id):
         return HttpResponse('403 Forbidden')
     
     return render(request, 'order.html', context={'order': order})
+
+
+@login_required
+def order_list(request):
+    """Представление страницы списка заказов Требует авторизацию.
+       По GET запросу возвращает список заказов.
+       Если пользователь имеет роль Customer, возвращает только его заказы.
+       Если пользователь имеет роль Seller, возращает все заказы."""
+
+    orders = Orders.objects.all()
+    return HttpResponse(orders)

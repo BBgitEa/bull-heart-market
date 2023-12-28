@@ -1,3 +1,4 @@
+"""Этот модуль содержит тесты приложения."""
 from django.test import TestCase
 from app.models import Product, User, get_crypted_key
 from django.contrib.auth.models import Group
