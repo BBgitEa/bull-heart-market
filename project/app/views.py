@@ -15,6 +15,10 @@ responces = {
     "no_auth" : JsonResponse({'status': '403', 'message': 'Not Authenticated.'}),
 }
 
+messages = {
+    'wrong_login_data': 'Неверные пароль или имя пользователя.',
+    'wrong_signup_data': 'Введены неверные данные.'
+}
 
 def index(request):
     categories = Category.objects.all()
@@ -92,9 +96,10 @@ def get_product_stack_from_request(request):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect(index)
+
     if request.method == 'GET':
-        if request.user.is_authenticated:
-            return redirect(index)
         return render(request, 'auth/login.html')
 
     username = request.POST['username']
@@ -113,12 +118,13 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect(index)
+    return redirect(login_view)
 
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect(index)
+
     if request.method == 'GET':
-        if request.user.is_authenticated:
-            return redirect(index)
         return render(request, 'auth/signup.html')
 
     username = request.POST['username']
@@ -129,7 +135,11 @@ def signup_view(request):
         try:
             validate_email(email)
         except ValidationError as e:
-            pass
+            return render(request, 'auth/signup.html', context= {
+                'message': 'Введены неверные данные.',
+                'last_username': username,
+                'last_email': email,
+            })
 
         if not is_user_exist(username, email):
             user = User.objects.create_user(username, email, password)
@@ -173,7 +183,6 @@ def activation_view(request, key):
 def is_user_exist(username, email):
     invalidName = User.objects.filter(username=username).first()
     invalidEmail = User.objects.filter(email=email).first()
-    print(invalidName, invalidEmail)
     if invalidName or invalidEmail:
         return True
     return False
