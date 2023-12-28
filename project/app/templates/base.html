@@ -19,8 +19,13 @@
           <a href="{% url 'about'%}" class="btn btn-link">О нас</a>
         </section>
         <section class="navbar-section">
-            <a href="#" class="btn btn-link text-dark mr-2">{{request.user.username}} <span class="entypo-user"></span></a></div>
-            <a href="{% url 'cart'%}" class="btn btn-link">Корзина <span class="entypo-dropbox"></a></div>
+          {% if user.is_authenticated %}
+            <a href="#" class="btn btn-link text-dark mr-2">{{request.user.username}} <span class="entypo-user"></span></a>
+            <a href="{% url 'cart'%}" class="btn btn-link">Корзина <span class="entypo-dropbox"></a>
+          {% else %}
+            <a href="{% url 'login'%}" class="btn btn-link text-dark mr-2">Вход</a>
+            <a href="{% url 'signup'%}" class="btn btn-link">Регистрация</a>
+          {% endif %}
         </section>
       </header>
 <div class="container">

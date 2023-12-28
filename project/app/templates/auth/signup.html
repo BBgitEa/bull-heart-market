@@ -1,18 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
-</head>
-<body>
-    <p style="color: red;">{{message}}</p>
-    <form action="{% url 'signup' %}" method="post">
-        {% csrf_token %}
-        <input name="username" type="text" value="{{last_username}}" />
-        <input name="email" type="text" value="{{last_email}}" />
-        <input name="password" type="password" />
-        <input type="submit" value="Регистрация" />
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+
+{% block content %}
+<div class="columns">
+    <div class="column col-3 col-mx-auto">
+        <h3 class="text-center">Регистрация</h3>
+        {% if message %}
+        <p class="text-center text-error"><span class="entypo-attention"></span> {{message}}</p>
+        {% endif %}
+        <form action="{% url 'signup' %}" method="post" class="form-group">
+
+            {% csrf_token %}
+            <label class="form-label" for="username"><span class="entypo-user"></span> Имя пользователя:</label>
+            <input class="form-input" name="username" type="text" value="{{last_username}}" />
+            <label class="form-label" for="email"><span class="entypo-mail"></span> Email:</label>
+            <input class="form-input" name="email" type="text" value="{{last_email}}" />
+            <label class="form-label" for="password"><span class="entypo-key"></span> Пароль:</label>
+            <input class="form-input" name="password" type="password" />
+            <button class="btn btn-primary btn-marg btn-block" type="submit">Создать</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

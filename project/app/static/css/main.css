@@ -129,3 +129,6 @@ font-family: 'maki', sans-serif;
     display: flex;
     justify-content: space-between;
 }
+.btn-marg{
+    margin-top: 1rem !important;
+}
