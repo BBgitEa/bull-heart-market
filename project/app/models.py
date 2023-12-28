@@ -72,7 +72,6 @@ class Cart(models.Model):
         except: 
             return None
 
-
     def get_summ(self):
         s = 0
         for prod in self.products.all():
@@ -80,7 +79,6 @@ class Cart(models.Model):
             print(s)
         return s
     
-
     def __str__(self):
         return f"Корзина {self.user.first_name} {self.user.last_name}"
 

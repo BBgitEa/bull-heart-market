@@ -93,6 +93,17 @@ class SignupViewTests(TestCase):
                 response = self.client.post('/signup/', follow=True, data=case)
                 self.assertContains(response, messages['wrong_signup_data'])
     
+    def test_get_request_authorized(self):
+        """Этот тест проверяет перенаправление на главную авторизированному пользователю. """
+
+        response = self.client.post('/login/', follow=True, data={'username': 'username', 'password': 'password'})
+        with self.subTest():
+            response = self.client.post('/signup/', follow=True, data={})
+            self.assertRedirects(response, '/')
+        with self.subTest():
+            response = self.client.get('/signup/', follow=True)
+            self.assertRedirects(response, '/')
+
     def test_valid_post_request(self):
         """Этот тест проверяет регистрацию пользователя и перенаправление на главную страницу"""
 
