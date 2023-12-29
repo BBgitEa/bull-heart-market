@@ -276,11 +276,15 @@ def order(request, order_id):
        По GET запросу возвращает страницу заказа."""
 
     order = get_object_or_404(Order, id=order_id)
-    try:
-        request.user.orders.get(id=order_id)
-    except:
-        return HttpResponse('403 Forbidden')
-    
+    is_seller = request.user.groups.filter(name='Seller').exists()
+    if is_seller:
+        return render(request, 'order.html', context={'order': order})
+    else:
+        try:
+            request.user.orders.get(id=order_id)
+        except:
+            return HttpResponse('403 Forbidden')
+
     return render(request, 'order.html', context={'order': order})
 
 
@@ -291,5 +295,9 @@ def order_list(request):
        Если пользователь имеет роль Customer, возвращает только его заказы.
        Если пользователь имеет роль Seller, возращает все заказы."""
 
-    orders = Orders.objects.all()
-    return HttpResponse(orders)
+    orders = Order.objects.filter(customer=request.user)
+    is_seller = request.user.groups.filter(name='Seller').exists()
+    all_orders = {}
+    if is_seller:
+        all_orders = Order.objects.all()
+    return render(request, 'order_list.html', context={'orders': orders, 'is_seller': is_seller, 'all_orders': all_orders})

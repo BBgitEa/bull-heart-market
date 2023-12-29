@@ -14,7 +14,7 @@
 {% block content %}
         <div class="cart-heading">
             <h3>Корзина</h3>
-            <a href="#" class="btn btn-link">История заказов</a>
+            <a href="{% url 'order_list' %}" class="btn btn-link">История заказов</a>
         </div>
         <div class="orderList">
         {% for product_stack in product_stacks %}

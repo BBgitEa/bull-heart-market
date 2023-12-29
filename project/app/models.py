@@ -100,9 +100,9 @@ class Order(models.Model):
     customer = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE, blank=True)
     products = models.ManyToManyField(ProductStack, related_name='orders', blank=True)
     statuses = {
-        0 : 'active',
-        1 : 'finished',
-        2 : 'canceled'
+        0 : 'Активный',
+        1 : 'Завершен',
+        2 : 'Отменен'
     }
     status = models.IntegerField(choices=statuses, blank=False, default=0)
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -113,6 +113,15 @@ class Order(models.Model):
         for prod in self.products.all():
             s += prod.count * prod.product.price
         return s
+    
+    def get_count(self):
+        s = 0
+        for prod in self.products.all():
+            s += prod.count
+        return s
+
+    def get_status(self):
+        return self.statuses[self.status]
 
     def send_new_order_email(self):
         send_mail(
@@ -122,6 +131,9 @@ class Order(models.Model):
             [self.customer.email],
             fail_silently= False
         )
+    
+    def __str__(self):
+        return 'Заказ №' + str(self.id)
 
 def get_crypted_key(value):
     salt = hashlib.sha256(str(random.random()).encode()).hexdigest()[:10]

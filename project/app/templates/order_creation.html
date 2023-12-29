@@ -1,3 +1,70 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<ul class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="#">{{user.username}}</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'cart' %}">Корзина</a>
+      </li>
+    <li class="breadcrumb-item">
+      <a href="#">Оформление заказа</a>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+        <h3>Оформление заказа</h3>
+        <p>Товары:</p>
+        <div class="orderList">
+        {% for product_stack in products %}
+          <div class="flexOrderRow">
+            <div class="flexOrderColumn Image"><img src="{{product_stack.product.preview.url}}" width="128"></div>
+            <div class="flexOrderColumn Name">{{product_stack.product}}</div>
+            <div class="flexOrderColumn ">{{product_stack.product.price}} руб/шт</div>
+            <div class="flexOrderColumn ProductStateMissing">
+                {% if not product_stack.product.available %}
+                <span class="entypo-attention"></span> Товара нет в наличии
+                {% endif %}
+            </div>
+            <div class="flexOrderColumn ">{{product_stack.count}} шт.</div>
+            <div class="flexOrderColumn PriceAll">{{product_stack.get_cost}} руб</div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="divider"></div>
+    <span>Итого: <span class="label label-primary">{{summ}}руб</span></span>
+    <div class="divider"></div>
+        <div class="columns">
+            <div class="column col-6">
+                <form method="post" class="item-delete-form">
+                    {% csrf_token %}
+                    <label class="form-label" for="input-example-3">Адрес доставки:</label>
+                    <textarea class="form-input" id="input-example-3" placeholder="Textarea" rows="3"></textarea>
+                    <label class="form-label">Способ получения:</label>
+                    <label class="form-radio">
+                      <input type="radio" name="get-method" checked>
+                      <i class="form-icon"></i> Курьер
+                    </label>
+                    <label class="form-radio">
+                      <input type="radio" name="get-method">
+                      <i class="form-icon"></i> Самовывоз
+                    </label>
+                    <label class="form-label">Способ оплаты:</label>
+                    <label class="form-radio">
+                      <input type="radio" name="pay-method" checked>
+                      <i class="form-icon"></i> Наличными
+                    </label>
+                    <label class="form-radio">
+                      <input type="radio" name="pay-method">
+                      <i class="form-icon"></i> По карте
+                    </label>
+                    <button class="btn btn-primary" id="submit" type="submit">Заказать</button>
+                </form>
+            </div>
+        </div>
+{% endblock %}
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,18 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заказ</title>
-</head>
-<body>
-    <p>Заказ №{{order.id}}</p>
-    <p>Товары:</p>
-    {% for product_stack in order.products.all %}
-    <div>
-        <a href="/product/{{product_stack.product.id}}">{{product_stack.product}}</a> - {{product_stack.count}} x 
-        {{product_stack.product.price}}руб/шт - {{product_stack.get_cost}} руб
-    </div>
-    {% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<ul class="breadcrumb">
+        <li class="breadcrumb-item">
+        <a href="#">{{user.username}}</a>
+        </li>
+        <li class="breadcrumb-item">
+        <a href="#">История заказов</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">{{order}}</a>
+        </li>
+  </ul>
+{% endblock %}
+
+{% block heading %}{{order}}{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column col-3">
+        <div class="cart-heading">
+            <span>ID заказа:</span>
+            <span>{{order.id}}</span>
+        </div>
+        <div class="cart-heading">
+            <span>Заказчик</span>
+            <span>{{order.customer}}</span>
+        </div>
+        <div class="cart-heading">
+            <span>Дата заказа:</span>
+            <span>{{order.creation_date}}</span>
+        </div>
+        <div class="cart-heading">
+            <span>Дата завершения:</span>
+            <span>{{order.finish_date}}</span>
+        </div>
+        <div class="cart-heading">
+            <span>Статус:</span>
+            <span>{{order.get_status}}</span>
+        </div>
+    </div> 
+</div>
+<div class="columns">
+    <div class="column col-10">
+        <p>
+            <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Товар</th>
+                    <th>Кол-во</th>
+                    <th>Цена</th>
+                    <th>Стоимость</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product_stack in order.products.all %}
+                  <tr>
+                    <td>{{product_stack.product}}</td>
+                    <td>{{product_stack.count}} шт.</td>
+                    <td>{{product_stack.product.price}} руб./шт.</td>
+                    <td>{{product_stack.get_cost}} руб.</td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <th>Итого:</th>
+                    <td>{{order.get_count}} шт.</td>
+                    <td>-</td>
+                    <th>{{order.get_summ}} руб.</th>
+                  </tr>
+                </tbody>
+              </table>
+        </p>
+    </div> 
+</div>
+{% endblock %}
